@@ -57,4 +57,18 @@ describe('lru cache', () => {
         c.write('e', 5);
         expect(c.toObject()).toStrictEqual({  b: 2 , c: 3, d: 4, e: 5 });
     });
+
+    test('read should refresh order', () => {
+        const c = createCache();
+        c.write('a', 1);
+        c.write('a', 2);
+        c.write('b', 2);
+        c.write('c', 3);
+        c.write('d', 4);
+        c.write('c', 3);
+
+        c.read('a');
+        expect(JSON.stringify(c.toObject(), null, 0))
+        .toBe(JSON.stringify({ b: 2, c: 3, d: 4, a: 2 }, null, 0));
+    });
   });

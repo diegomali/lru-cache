@@ -1,45 +1,34 @@
  class Cache {
     _maxRecords = 0;
     _innerData = new Map();
-    _keys = [];
     constructor(maxRecords = 10) {
         this._maxRecords = maxRecords;
     }
-
     delete(key) {
-        this._keys = this._keys.filter((x) => x !== key);
         this._innerData.delete(key);
     }
-
     count() {
         return this._innerData.size;
     }
-
     clear() {
-        this._keys.length = 0;
         this._innerData.clear();
     }
-
     write(key, value) {
-        this._keys.push(key);
         this._innerData.set(key, value);
-        if (this._keys.length > this._maxRecords) {
-            const k = this._keys.shift();
+        if (this._innerData.size > this._maxRecords) {
+            const k = this._innerData.keys().next().value;
             this.delete(k);
         }
     }
-
     read(key) {
-        return this._innerData.get(key) ?? null;
+        const value = this._innerData.get(key);
+        this._innerData.delete(key);
+        this._innerData.set(key, value);
+        return value ?? null;
     }
 
     toObject() {
-        return this._keys.reduce((x, key) => {
-            const value = this.read(key);
-            x[key] = value;
-            return x;
-        }, {});
+        return Object.fromEntries(this._innerData)
     }
 }
-
 exports.default = Cache;
