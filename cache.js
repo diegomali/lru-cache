@@ -14,6 +14,7 @@
         this._innerData.clear();
     }
     write(key, value) {
+        this._innerData.delete(key);
         this._innerData.set(key, value);
         if (this._innerData.size > this._maxRecords) {
             const k = this._innerData.keys().next().value;
@@ -21,9 +22,11 @@
         }
     }
     read(key) {
-        const value = this._innerData.get(key);
-        this._innerData.delete(key);
-        this._innerData.set(key, value);
+       const value = this._innerData.get(key);
+       if (value !== undefined) {
+            this._innerData.delete(key);
+            this._innerData.set(key, value);
+        }
         return value ?? null;
     }
 
